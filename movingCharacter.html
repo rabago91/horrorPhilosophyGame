@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moving Character</title>
+    <script src="js/pixi.min.js"></script>
+    <script>
+        let app;
+        let player;
+        let keys = {};
+        let keysDiv;
+        let playerSheet = {};
+        let speed = 2;
+
+        window.onload = function () {
+            app = new PIXI.Application(
+                {
+                    width: 800,
+                    height: 600,
+                    backgroundColor: 0xAAAAAA
+                }
+            );
+
+            document.body.appendChild(app.view);
+
+            app.loader.add("batman", "src/Sprites/batmanSprite.png");
+            app.loader.load(doneLoading);
+
+            //keyboard event handlers
+            window.addEventListener("keydown", keysDown);
+            window.addEventListener("keyup", KeysUp);
+
+            keysDiv = document.querySelector("#keys");
+        }
+
+        function doneLoading(e) {
+            createPlayerSheet();
+            createPlayer();
+            app.ticker.add(gameloop);
+        }
+
+        function createPlayerSheet(e) {
+            let ssheet = new PIXI.BaseTexture.from(app.loader.resources["batman"].url);
+            let w = 26;
+            let h = 38;
+
+            playerSheet["standSouth"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(1 * w, 0, w, h))
+            ];
+            playerSheet["standWest"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(4 * w, 0, w, h))
+            ];
+            playerSheet["standEast"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(7 * w, 0, w, h))
+            ];
+            playerSheet["standNorth"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(10 * w, 0, w, h))
+            ];
+            playerSheet["walkSouth"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(2 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(0 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(1 * w, 0, w, h))
+            ];
+            playerSheet["walkWest"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(5 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(3 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(4 * w, 0, w, h))
+            ];
+            playerSheet["walkEast"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(8 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(6 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(7 * w, 0, w, h))
+            ];
+            playerSheet["walkNorth"] = [
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(11 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(9 * w, 0, w, h)),
+                new PIXI.Texture(ssheet, new PIXI.Rectangle(10 * w, 0, w, h))
+            ];
+        }
+
+        function createPlayer() {
+            player = new PIXI.AnimatedSprite(playerSheet.standSouth);
+            player.anchor.set(0.5);
+            player.animationSpeed = .5;
+            player.loop = false;
+            player.x = app.view.width / 2;
+            player.y = app.view.height / 2;
+            app.stage.addChild(player);
+            player.play();
+        }
+
+        function keysDown(e) {
+            // console.log(e.keyCode);
+            keys[e.keyCode] = true;
+        }
+
+        function KeysUp(e) {
+            // console.log(e.keyCode);
+            keys[e.keyCode] = false;
+        }
+
+        function gameloop() {
+
+            //Rigth
+            if (keys["39"]) {
+                if (!player.playing) {
+                    player.textures = playerSheet.walkEast;
+                    player.play();
+                }
+                player.x += 5;
+            }
+            //Left
+            if (keys["37"]) {
+                if (!player.playing) {
+                    player.textures = playerSheet.walkWest;
+                    player.play();
+                }
+                player.x -= 5;
+            }
+            //Up
+            if (keys["38"]) {
+                if (!player.playing) {
+                    player.textures = playerSheet.walkNorth;
+                    player.play();
+                }
+                player.y -= 5;
+            }
+            //Down
+            if (keys["40"]) {
+                if (!player.playing) {
+                    player.textures = playerSheet.walkSouth;
+                    player.play();
+                }
+                player.y += 5;
+            }
+        }
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
